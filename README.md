@@ -1,6 +1,7 @@
 # AutoLab Builder
 
 AutoLab Builder automates the extraction of live network device configurations and topology, cleans and normalizes interface names, and generates an EVE-NG `.unl` topology file plus startup configs ready for import.
+Note: I was not have to get the interfaces in the config matching the CDP information, but it's added to me TODO list!
 
 ## Prerequisites
 
