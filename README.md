@@ -3,34 +3,6 @@
 
 AutoLab Builder automates the extraction of live network device configurations and topology, cleans and normalizes interface names, and generates an EVE-NG `.unl` topology file plus startup configs ready for import.
 
-## Repository Layout
-
-```
-.
-├── config/
-│   ├── __init__.py
-│   └── cleaner.py
-├── eve/
-│   ├── __init__.py
-│   └── unl_generator.py
-├── parser/
-│   ├── __init__.py
-│   ├── topology_builder.py
-│   └── templates/
-│       ├── cdp_neighbors.ttp
-│       ├── show_inventory.ttp
-│       └── show_version.ttp
-├── tools/
-│   ├── __init__.py
-│   ├── bgp_to_SVI.py
-│   └── static_route_to_loopback.py
-├── inventory.csv
-├── main.py
-├── model_map.json
-├── requirements.txt
-└── README.md
-```
-
 ## Prerequisites
 
 - Python 3.7+
