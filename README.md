@@ -1,4 +1,3 @@
-```markdown
 # AutoLab Builder
 
 AutoLab Builder automates the extraction of live network device configurations and topology, cleans and normalizes interface names, and generates an EVE-NG `.unl` topology file plus startup configs ready for import.
@@ -14,7 +13,6 @@ AutoLab Builder automates the extraction of live network device configurations a
 git clone https://github.com/Murpup569/prod2virtual_automation_tool.git
 cd AutoLab-Builder
 pip install -r requirements.txt
-```
 
 ## Configuration
 
