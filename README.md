@@ -51,4 +51,3 @@ This will:
 4. Open the lab, **Start** nodes, and your configs will be applied automatically.
 
 *Happy labbing!*  
-```
