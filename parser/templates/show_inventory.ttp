@@ -1,0 +1,4 @@
+<group name="inventory">
+NAME: "{{ name }}", DESCR: "{{ descr }}"
+PID: {{ model_id | OR("PID:") | strip(",") }}
+</group>

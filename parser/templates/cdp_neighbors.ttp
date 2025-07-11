@@ -1,0 +1,4 @@
+Device ID: {{ remote_host }}
+  IP address: {{ remote_ip_address }}
+Platform: {{ remote_platform }}
+Interface: {{ local_interface }},  Port ID (outgoing port): {{ remote_port }}

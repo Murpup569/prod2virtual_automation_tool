@@ -1,0 +1,26 @@
+{
+  "C9300-24T": {
+    "eve_image": "vios-adventerprisek9-m",
+    "note": "Maps 9300 to an IOSvL2 image; adjust port mappings manually"
+  },
+    "C9300-48U": {
+    "eve_image": "vios-adventerprisek9-m",
+    "note": "Maps 9300 to an IOSvL2 image; adjust port mappings manually"
+  },
+  "C9500-40X": {
+    "eve_image": "vios-adventerprisek9-m",
+    "note": "Maps 9500 to IOSv image; limited port support"
+  },
+  "ISR4451": {
+    "eve_image": "csr1000vng-universalk9.17.03.02.Amsterdam",
+    "note": "ISR routers typically map well to vIOS image"
+  },
+  "ASR1001-X": {
+    "eve_image": "csr1000vng-universalk9.17.03.02.Amsterdam",
+    "note": "ASR platform is approximated with vIOS"
+  },
+  "Catalyst3850": {
+    "eve_image": "vios-adventerprisek9-m",
+    "note": "Older Catalyst switches to IOSvL2"
+  }
+}
