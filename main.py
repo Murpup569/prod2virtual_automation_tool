@@ -10,6 +10,26 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import getpass
 
+def build_map_from_cdp(entries):
+    """Generate a mapping of physical interface names to generic
+    GigabitEthernetX/Y names based on CDP entries."""
+    interface_map = {}
+    counter = 0
+    physical_pattern = re.compile(
+        r"^(?:GigabitEthernet|FastEthernet|TenGigabitEthernet|Ethernet|Gi|Fa|Te)"
+    )
+
+    for entry in entries:
+        iface = entry.get("local_interface")
+        if not iface or not physical_pattern.match(iface):
+            continue
+        if iface not in interface_map:
+            module = counter // 4
+            port = counter % 4
+            interface_map[iface] = f"GigabitEthernet{module}/{port}"
+            counter += 1
+    return interface_map
+
 INVENTORY_FILE = "inventory.csv"
 CONFIG_DIR = "output/configs"
 UNL_PATH = "output/AutoLab.unl"
@@ -41,14 +61,16 @@ def run_commands(device):
 
 def extract_model_id(parsed_inventory, show_version):
     try:
-        # Try inventory first
         if parsed_inventory:
-            entries = parsed_inventory[0]
-            if isinstance(entries, list):
+            entries = parsed_inventory
+            if isinstance(entries, list) and len(entries) == 1 and isinstance(entries[0], list):
                 entries = entries[0]
-            for item in entries:
-                if "model_id" in item:
-                    return item["model_id"]
+            if isinstance(entries, list):
+                for item in entries:
+                    if isinstance(item, dict) and "model_id" in item:
+                        return item["model_id"]
+            elif isinstance(entries, dict) and "model_id" in entries:
+                return entries["model_id"]
     except (IndexError, TypeError, AttributeError):
         pass
 
@@ -94,16 +116,32 @@ def build_cleaned_outputs(inventory):
     for device in inventory:
         print(f"[*] Connecting to {device['hostname']}...")
         output = run_commands(device)
-        cleaned, iface_map = normalize_config_interfaces(remove_unsupported_commands(output["show running-config"]))
-        raw_configs[device["hostname"]] = cleaned
-        interface_maps[device["hostname"]] = iface_map
 
-        parsed_cdp = parse_output_with_ttp(f"{TTP_TEMPLATE_PATH}/cdp_neighbors.ttp", output["show cdp neighbors detail"])
-        parsed_inventory = parse_output_with_ttp(f"{TTP_TEMPLATE_PATH}/show_inventory.ttp", output["show inventory"])
+        parsed_cdp = parse_output_with_ttp(
+            f"{TTP_TEMPLATE_PATH}/cdp_neighbors.ttp",
+            output["show cdp neighbors detail"],
+        )
+        parsed_inventory = parse_output_with_ttp(
+            f"{TTP_TEMPLATE_PATH}/show_inventory.ttp",
+            output["show inventory"],
+        )
 
         cdp_entries = json.loads(parsed_cdp[0])
         if isinstance(cdp_entries, list) and len(cdp_entries) == 1 and isinstance(cdp_entries[0], list):
             cdp_entries = cdp_entries[0]
+
+        iface_map = build_map_from_cdp(cdp_entries)
+
+        cleaned, iface_map = normalize_config_interfaces(
+            remove_unsupported_commands(output["show running-config"]),
+            iface_map,
+        )
+        raw_configs[device["hostname"]] = cleaned
+        interface_maps[device["hostname"]] = iface_map
+
+        inventory_entries = json.loads(parsed_inventory[0])
+        if isinstance(inventory_entries, list) and len(inventory_entries) == 1 and isinstance(inventory_entries[0], list):
+            inventory_entries = inventory_entries[0]
 
         filtered_entries = []
         for entry in cdp_entries:
@@ -117,7 +155,7 @@ def build_cleaned_outputs(inventory):
             filtered_entries.append(entry)
 
         cdp_data[device["hostname"]] = filtered_entries
-        version_data[device["hostname"]] = extract_model_id(parsed_inventory, output["show version"])
+        version_data[device["hostname"]] = extract_model_id(inventory_entries, output["show version"])
 
     return raw_configs, cdp_data, version_data, interface_maps
 
